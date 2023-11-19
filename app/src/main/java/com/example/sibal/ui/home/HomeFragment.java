@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,6 +37,25 @@ public class HomeFragment extends Fragment {
         HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // DBHelper 객체 초기화
+        dbHelper = new DBHelper(getContext());
+
+        CalendarView calendarView = root.findViewById(R.id.calendarView);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                // 선택된 날짜 정보를 기반으로 문자열로 변환
+                String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+
+                // DBHelper를 통해 선택된 날짜의 지출값을 가져옴
+                int totalExpense = dbHelper.calculateDailyExpense(selectedDate);
+
+                // 가져온 값으로 TextView 등에 표시
+                TextView textView5 = root.findViewById(R.id.textView5);
+                textView5.setText(String.valueOf(totalExpense));
+            }
+        });
 
         // 수정된 코드 추가 시작
         // earning에 str2 값을 설정
@@ -69,6 +89,11 @@ public class HomeFragment extends Fragment {
         }
         // 수정된 코드 추가 끝
 
+
+
+        // textView5 하루 소비 금액 넣기
+
+
         return root;
     }
 
@@ -78,4 +103,3 @@ public class HomeFragment extends Fragment {
         binding = null;
     }
 }
-
